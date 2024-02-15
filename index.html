@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        #imagenContainer {
+            position: relative;
+            width: 300px;
+            height: 200px;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer; /* Cambia el cursor al hacer clic */
+        }
+
+        #imagenContainer img {
+            width: 100%;
+            height: 100%;
+            transition: opacity 0.3s ease-out, transform 1s ease-in-out; /* Agregamos una transición para la animación */
+            user-select: none; /* Evita que la imagen sea seleccionable y arrastrable */
+            margin: 0; /* Asegura que no haya márgenes por defecto */
+        }
+
+        /* Clase para la animación de cambio de imagen */
+        .animate-image {
+            transform: scale(1.0); /* Ejemplo de transformación, puedes ajustar según tu preferencia */
+        }
+    </style>
+</head>
+<body>
+    <div id="imagenContainer">
+        <img src="../ben10watch/sources/background.png" alt="Alien 1" id="imagen">
+    </div>
+
+    <script>
+        const imagenContainer = document.getElementById('imagenContainer');
+        const imagen = document.getElementById('imagen');
+        const totalImagenes = 10;
+        let imagenIndex = 1; // Índice de la imagen actual
+        let isMousePressed = false;
+        let rotationEnabled = false; // Variable para indicar si la rotación está habilitada
+        let firstClick = true;
+        let specificImageVisible = false; // Variable para controlar la visibilidad de la imagen específica
+        let animationInterval; // Variable para almacenar el intervalo de la animación
+
+        // Controlador de clic en el contenedor
+        imagenContainer.addEventListener('click', () => {
+            if (firstClick) {
+                // Cambiar la imagen al alien1 en el primer clic
+                imagen.src = `../ben10watch/sources/alien1.jpg`;
+
+
+                firstClick=false;
+                // Inicia el comportamiento de rotación de imágenes
+                imagen.addEventListener('mousedown', (e) => {
+                    e.preventDefault(); // Evita el comportamiento predeterminado de arrastre
+                    isMousePressed = true;
+                });
+
+                window.addEventListener('mouseup', () => {
+                    isMousePressed = false;
+                });
+
+                imagenContainer.addEventListener('mousemove', (e) => {
+                    if (isMousePressed && !specificImageVisible) {
+                        // Calcular el ángulo del movimiento del ratón
+                        const { clientX, clientY } = e;
+                        const { left, top, width, height } = imagenContainer.getBoundingClientRect();
+                        const centerX = left + width / 2;
+                        const centerY = top + height / 2;
+                        const angle = Math.atan2(clientY - centerY, clientX - centerX) * (180 / Math.PI) + 180;
+
+                        // Determinar la imagen según el ángulo
+                        const angleStep = 360 / totalImagenes;
+                        imagenIndex = Math.floor((angle % 360) / angleStep) + 1;
+
+                        // Construir la ruta de la imagen
+                        const imagePath = `../ben10watch/sources/alien${imagenIndex}.jpg`;
+
+                        // Cambiar la imagen si es diferente de la actual
+                        if (imagen.src !== imagePath) {
+                            imagen.src = imagePath;
+                        }
+                    }
+                });
+
+                imagenContainer.addEventListener('mouseleave', () => {
+                    // Restaurar la imagen original cuando el ratón sale del contenedor
+                    if (!specificImageVisible) {
+                        imagen.src = `../ben10watch/sources/alien${imagenIndex}.jpg`;
+                        specificImageVisible = true;
+                    }
+                });
+            } else {
+                if (!rotationEnabled) {
+                    // Si la rotación no está habilitada, mostrar la imagen sin animación
+                    const specificImagePath = `../ben10watch/sources/alien${imagenIndex}.jpg`;
+                    imagen.src = specificImagePath;
+                    rotationEnabled = true; // Habilitar la rotación después de cargar la imagen sin animación
+                } else {
+                    // Si ya se ha hecho clic, cambiar a una imagen específica al hacer clic nuevamente
+                    const specificImagePath = `../ben10watch/sources/destransform.jpg`;
+
+                    if (specificImageVisible) {
+                        // Si ya se muestra la imagen específica, regresar a la imagen original
+                        specificImageVisible = false;
+                        imagen.src = `../ben10watch/sources/alien${imagenIndex}.jpg`;
+                    } else {
+                        // Agregar una clase para activar la animación CSS
+                        imagen.classList.add('animate-image');
+
+                        // Iniciar la animación entre dos imágenes
+                        let alternate = true;
+                        animationInterval = setInterval(() => {
+                            if (alternate) {
+                                imagen.src = `../ben10watch/sources/destransform.jpg`;
+                            } else {
+                                imagen.src = `../ben10watch/sources/transform.jpg`;
+                            }
+                            alternate = !alternate;
+                        }, 500); // Cambiar cada 500 ms (medio segundo)
+
+                        // Detener la animación después de 2000 ms (2 segundos)
+                        setTimeout(() => {
+                            clearInterval(animationInterval);
+                            specificImageVisible = true;
+                            imagen.src = specificImagePath;
+                            imagen.classList.remove('animate-image'); // Eliminar la clase después de la animación
+                        }, 3000);
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
