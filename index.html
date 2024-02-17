@@ -6,8 +6,8 @@
     <style>
         #imagenContainer {
             position: relative;
-            width: 300px;
-            height: 200px;
+            width: 360px;
+            height: 360px;
             overflow: hidden;
             display: flex;
             justify-content: center;
@@ -39,34 +39,26 @@
         const imagen = document.getElementById('imagen');
         const totalImagenes = 10;
         let imagenIndex = 1; // Índice de la imagen actual
-        let isMousePressed = false;
+        let isTouchActive = false; // Variable para indicar si la interacción táctil está activa
         let rotationEnabled = false; // Variable para indicar si la rotación está habilitada
-        let firstClick = true;
         let specificImageVisible = false; // Variable para controlar la visibilidad de la imagen específica
         let animationInterval; // Variable para almacenar el intervalo de la animación
 
-        // Controlador de clic en el contenedor
-        imagenContainer.addEventListener('click', () => {
-            if (firstClick) {
-                // Cambiar la imagen al alien1 en el primer clic
+        // Función para manejar eventos táctiles
+        function handleTouch(e) {
+            e.preventDefault(); // Evita el comportamiento predeterminado del evento táctil
+
+            if (!isTouchActive) {
+                isTouchActive = true;
+
+                // Cambiar la imagen al alien1 en el primer toque
                 imagen.src = `../ben10watch/sources/alien1.jpg`;
 
-
-                firstClick=false;
                 // Inicia el comportamiento de rotación de imágenes
-                imagen.addEventListener('mousedown', (e) => {
-                    e.preventDefault(); // Evita el comportamiento predeterminado de arrastre
-                    isMousePressed = true;
-                });
-
-                window.addEventListener('mouseup', () => {
-                    isMousePressed = false;
-                });
-
-                imagenContainer.addEventListener('mousemove', (e) => {
-                    if (isMousePressed && !specificImageVisible) {
-                        // Calcular el ángulo del movimiento del ratón
-                        const { clientX, clientY } = e;
+                imagen.addEventListener('touchmove', (e) => {
+                    if (!specificImageVisible) {
+                        // Calcular el ángulo del movimiento táctil
+                        const { clientX, clientY } = e.touches[0];
                         const { left, top, width, height } = imagenContainer.getBoundingClientRect();
                         const centerX = left + width / 2;
                         const centerY = top + height / 2;
@@ -87,7 +79,7 @@
                 });
 
                 imagenContainer.addEventListener('mouseleave', () => {
-                    // Restaurar la imagen original cuando el ratón sale del contenedor
+                    // Restaurar la imagen original cuando se levanta el dedo
                     if (!specificImageVisible) {
                         imagen.src = `../ben10watch/sources/alien${imagenIndex}.jpg`;
                         specificImageVisible = true;
@@ -100,7 +92,7 @@
                     imagen.src = specificImagePath;
                     rotationEnabled = true; // Habilitar la rotación después de cargar la imagen sin animación
                 } else {
-                    // Si ya se ha hecho clic, cambiar a una imagen específica al hacer clic nuevamente
+                    // Si ya se ha hecho toque, cambiar a una imagen específica al hacer otro toque
                     const specificImagePath = `../ben10watch/sources/destransform.jpg`;
 
                     if (specificImageVisible) {
@@ -132,7 +124,13 @@
                     }
                 }
             }
-        });
+        }
+
+        // Asignar la función de manejo táctil al contenedor de la imagen
+        imagenContainer.addEventListener('touchstart', handleTouch);
+
+        // Asignar la función de manejo de clic al contenedor de la imagen
+        imagenContainer.addEventListener('click', handleTouch);
     </script>
 </body>
 </html>
