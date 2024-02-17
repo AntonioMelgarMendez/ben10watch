@@ -3,6 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <audio id="destransform">
+        <source src="../ben10watch/sources/notransform.mp3" type="audio/mp3">
+        Tu navegador no soporta el elemento de audio.
+    </audio>
+
+    <audio id="transform">
+        <source src="../ben10watch/sources/transform.mp3" type="audio/mp3">
+        Tu navegador no soporta el elemento de audio.
+    </audio>
+    <audio id="open">
+        <source src="../ben10watch/sources/open.mp3" type="audio/mp3">
+        Tu navegador no soporta el elemento de audio.
+    </audio>
+    <audio id="selector ">
+        <source src="../ben10watch/sources/selector.mp3" type="audio/mp3">
+        Tu navegador no soporta el elemento de audio.
+    </audio>
     <style>
         #imagenContainer {
             position: relative;
@@ -43,7 +60,10 @@
         let rotationEnabled = false; // Variable para indicar si la rotación está habilitada
         let specificImageVisible = false; // Variable para controlar la visibilidad de la imagen específica
         let animationInterval; // Variable para almacenar el intervalo de la animación
-
+        function playSound(soundId) {
+    const audio = document.getElementById(soundId);
+    audio.play();
+}
         // Función para manejar eventos táctiles
         function handleTouch(e) {
             e.preventDefault(); // Evita el comportamiento predeterminado del evento táctil
@@ -53,7 +73,7 @@
 
                 // Cambiar la imagen al alien1 en el primer toque
                 imagen.src = `../ben10watch/sources/alien1.jpg`;
-
+                playSound("open");
                 // Inicia el comportamiento de rotación de imágenes
                 imagen.addEventListener('touchmove', (e) => {
                     if (!specificImageVisible) {
@@ -73,6 +93,7 @@
 
                         // Cambiar la imagen si es diferente de la actual
                         if (imagen.src !== imagePath) {
+                            playSound("selector");
                             imagen.src = imagePath;
                         }
                     }
@@ -99,6 +120,7 @@
                         // Si ya se muestra la imagen específica, regresar a la imagen original
                         specificImageVisible = false;
                         imagen.src = `../ben10watch/sources/alien${imagenIndex}.jpg`;
+                        playSound("destransform");
                     } else {
                         // Agregar una clase para activar la animación CSS
                         imagen.classList.add('animate-image');
@@ -112,6 +134,7 @@
                                 imagen.src = `../ben10watch/sources/transform.jpg`;
                             }
                             alternate = !alternate;
+                            playSound("transform");
                         }, 500); // Cambiar cada 500 ms (medio segundo)
 
                         // Detener la animación después de 2000 ms (2 segundos)
